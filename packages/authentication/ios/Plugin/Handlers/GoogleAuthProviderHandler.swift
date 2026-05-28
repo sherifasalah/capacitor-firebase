@@ -2,9 +2,7 @@ import Foundation
 import Capacitor
 import FirebaseCore
 import FirebaseAuth
-#if RGCFA_INCLUDE_GOOGLE
 import GoogleSignIn
-#endif
 
 class GoogleAuthProviderHandler: NSObject {
     var pluginImplementation: FirebaseAuthentication
@@ -23,13 +21,10 @@ class GoogleAuthProviderHandler: NSObject {
     }
 
     func signOut() {
-        #if RGCFA_INCLUDE_GOOGLE
         GIDSignIn.sharedInstance.signOut()
-        #endif
     }
 
     private func startSignInWithGoogleFlow(_ call: CAPPluginCall, isLink: Bool) {
-        #if RGCFA_INCLUDE_GOOGLE
         guard let clientId = FirebaseApp.app()?.options.clientID else { return }
         let config = GIDConfiguration(clientID: clientId, serverClientID: clientId)
         GIDSignIn.sharedInstance.configuration = config
@@ -46,12 +41,9 @@ class GoogleAuthProviderHandler: NSObject {
                     }
                     return
                 }
-
                 guard let user = result?.user,
                       let idToken = user.idToken?.tokenString
-                else {
-                    return
-                }
+                else { return }
                 let accessToken = user.accessToken.tokenString
                 let serverAuthCode = result?.serverAuthCode
                 let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
@@ -64,6 +56,5 @@ class GoogleAuthProviderHandler: NSObject {
                 }
             }
         }
-        #endif
     }
 }
